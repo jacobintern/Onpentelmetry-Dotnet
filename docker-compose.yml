@@ -1,0 +1,44 @@
+services:
+  webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dotnet-otel-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - OTLP_ENDPOINT=http://tempo:4317
+    ports:
+      - "5100:8080"
+    depends_on:
+      - tempo
+    networks:
+      - otel-net
+
+  tempo:
+    image: grafana/tempo:2.5.0
+    container_name: grafana-tempo
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml
+    ports:
+      - "4317:4317"   # OTLP gRPC port
+      - "3200:3200"   # Tempo query port
+    networks:
+      - otel-net
+
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - tempo
+    networks:
+      - otel-net
+
+networks:
+  otel-net:
+    driver: bridge
