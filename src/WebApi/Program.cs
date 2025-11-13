@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 服務名稱（會顯示在 Grafana / Tempo）
 const string serviceName = "demo.Api";
 const string serviceVersion = "1.0.0";
+var endpoint = Environment.GetEnvironmentVariable("OTLP_ENDPOINT");
 
 // 設定 OpenTelemetry
 builder.Services.AddOpenTelemetry()
@@ -21,7 +22,7 @@ builder.Services.AddOpenTelemetry()
         .AddOtlpExporter(o =>
         {
             // Grafana Tempo 或 OTLP Collector
-            o.Endpoint = new Uri("http://tempo:4317");
+            o.Endpoint = new Uri(endpoint);
         }))
     // ---Metrics pipeline---
     .WithMetrics(meterProviderBuilder => meterProviderBuilder
@@ -30,7 +31,7 @@ builder.Services.AddOpenTelemetry()
         .AddHttpClientInstrumentation()
         .AddOtlpExporter(o =>
         {
-            o.Endpoint = new Uri("http://tempo:4317");
+            o.Endpoint = new Uri(endpoint);
         }));
 
 builder.Services.AddControllers();
