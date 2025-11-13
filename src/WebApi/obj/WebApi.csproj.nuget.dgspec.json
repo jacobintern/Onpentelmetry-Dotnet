@@ -46,6 +46,10 @@
               "target": "Package",
               "version": "[1.13.1, )"
             },
+            "OpenTelemetry.Exporter.Console": {
+              "target": "Package",
+              "version": "[1.13.1, )"
+            },
             "OpenTelemetry.Exporter.OpenTelemetryProtocol": {
               "target": "Package",
               "version": "[1.13.1, )"

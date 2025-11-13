@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
@@ -12,6 +13,8 @@ namespace WebApi.Controllers
             "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
+        private static readonly ActivitySource ActivitySource = new("demo.Api");
+
         private readonly ILogger<WeatherForecastController> _logger;
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
@@ -23,6 +26,10 @@ namespace WebApi.Controllers
         public IEnumerable<WeatherForecast> Get()
         {
             _logger.LogInformation("Processing WeatherForecast request");
+
+            using var activity = ActivitySource.StartActivity("manual-span");
+
+            Console.WriteLine($"Manual span created: {activity?.Id}");
 
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

@@ -1,42 +1,57 @@
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Logs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // 服務名稱（會顯示在 Grafana / Tempo）
 const string serviceName = "demo.Api";
-const string serviceVersion = "1.0.0";
 var endpoint = Environment.GetEnvironmentVariable("OTLP_ENDPOINT");
+Console.WriteLine($"OTLP endpoint = {endpoint}");
 
 // 設定 OpenTelemetry
 builder.Services.AddOpenTelemetry()
-    .ConfigureResource(resource => resource
-        .AddService(serviceName: serviceName, serviceVersion: serviceVersion)
-        .AddTelemetrySdk())
-    // --- Tracing pipeline ---
-    .WithTracing(tracerProviderBuilder => tracerProviderBuilder
-        .AddSource(serviceName)
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddOtlpExporter(o =>
-        {
-            // Grafana Tempo 或 OTLP Collector
-            o.Endpoint = new Uri(endpoint);
-        }))
-    // ---Metrics pipeline---
-    .WithMetrics(meterProviderBuilder => meterProviderBuilder
-        .AddRuntimeInstrumentation()
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddOtlpExporter(o =>
+    .ConfigureResource(r => r.AddService(serviceName))
+    .WithTracing(t =>
+    {
+        t.AddSource(serviceName);
+        t.AddHttpClientInstrumentation();
+        t.AddAspNetCoreInstrumentation();
+        t.AddOtlpExporter(o =>
         {
             o.Endpoint = new Uri(endpoint);
-        }));
+            o.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
+        });
+        // Debug 用
+        t.AddConsoleExporter();
+    })
+    .WithMetrics(m =>
+    {
+        m.AddRuntimeInstrumentation();
+        m.AddAspNetCoreInstrumentation();
+        m.AddOtlpExporter(o =>
+        {
+            o.Endpoint = new Uri(endpoint);
+            o.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
+        });
+    });
+
+builder.Logging.AddOpenTelemetry(logging => logging.AddConsoleExporter());
 
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+var otel = app.Services.GetRequiredService<TracerProvider>();
+if (otel == null)
+{
+    throw new Exception("OpenTelemetry 初始化失敗");
+}
+else
+{
+    Console.WriteLine("OpenTelemetry 初始化成功");
+}
 
 app.UseRouting();
 app.MapControllers();

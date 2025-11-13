@@ -28,8 +28,8 @@ services:
   grafana:
     image: grafana/grafana:10.2.2
     container_name: grafana
-    volumes:
-      - ./provisioning/datasources:/etc/grafana/provisioning/datasources
+    # volumes:
+    #   - ./provisioning/datasources:/etc/grafana/provisioning/datasources
     ports:
       - "3000:3000"
     environment:
