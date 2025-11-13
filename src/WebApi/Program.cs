@@ -23,7 +23,7 @@ builder.Services.AddOpenTelemetry()
             // Grafana Tempo 或 OTLP Collector
             o.Endpoint = new Uri("http://tempo:4317");
         }))
-    // --- Metrics pipeline ---
+    // ---Metrics pipeline---
     .WithMetrics(meterProviderBuilder => meterProviderBuilder
         .AddRuntimeInstrumentation()
         .AddAspNetCoreInstrumentation()

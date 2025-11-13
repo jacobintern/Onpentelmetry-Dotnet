@@ -5,7 +5,7 @@ distributor:
   receivers:
     otlp:
       protocols:
-        grpc:
+        grpc: {} # ★ OTLP 接收器啟用
 
 ingester:
   trace_idle_period: 10s

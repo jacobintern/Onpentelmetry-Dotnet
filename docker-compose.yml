@@ -21,7 +21,6 @@ services:
     volumes:
       - ./tempo.yaml:/etc/tempo.yaml
     ports:
-      - "4317:4317"   # OTLP gRPC port
       - "3200:3200"   # Tempo query port
     networks:
       - otel-net
@@ -29,6 +28,8 @@ services:
   grafana:
     image: grafana/grafana:10.2.2
     container_name: grafana
+    volumes:
+      - ./provisioning/datasources:/etc/grafana/provisioning/datasources
     ports:
       - "3000:3000"
     environment:
