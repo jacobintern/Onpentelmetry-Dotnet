@@ -21,7 +21,7 @@ services:
     volumes:
       - ./tempo.yaml:/etc/tempo.yaml
     ports:
-      - "3200:3200"   # Tempo query port
+      - "3200:3200"
     networks:
       - otel-net
 
