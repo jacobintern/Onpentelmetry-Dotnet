@@ -1,4 +1,3 @@
-using OpenTelemetry;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
@@ -16,6 +15,7 @@ builder.Services.AddOpenTelemetry()
         .AddTelemetrySdk())
     // --- Tracing pipeline ---
     .WithTracing(tracerProviderBuilder => tracerProviderBuilder
+        .AddSource(serviceName)
         .AddAspNetCoreInstrumentation()
         .AddHttpClientInstrumentation()
         .AddOtlpExporter(o =>
