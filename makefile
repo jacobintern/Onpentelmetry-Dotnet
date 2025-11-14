@@ -8,7 +8,10 @@ down:
 	@echo "🧹 Stopping & removing containers, images, volumes..."
 	docker compose down --rmi all --volumes --remove-orphans
 
-rebuild: down up
+rebuild:
+	docker compose down -v --remove-orphans
+	docker compose build --no-cache
+	docker compose up -d
 
 logs:
 	@echo "📜 Showing API container logs..."
