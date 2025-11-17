@@ -2,13 +2,22 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Logs;
+using System.Diagnostics;
+using WebApi;
+using WebApi.interfaces;
+using WebApi.repositories;
+using WebApi.services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 服務名稱（會顯示在 Grafana / Tempo）
-const string serviceName = "demo.Api";
-var endpoint = Environment.GetEnvironmentVariable("OTLP_ENDPOINT");
-Console.WriteLine($"OTLP endpoint = {endpoint}");
+// 綁定設定檔
+builder.Services.Configure<Config>(builder.Configuration);
+var moduleName = builder.Configuration.GetValue<string>("ModuleName")
+    ?? throw new Exception("ModuleName 未設定");
+
+// 服務名稱（會顯示在 Grafana / Tempo
+var endpoint = Environment.GetEnvironmentVariable("OTLP_ENDPOINT")
+    ?? throw new Exception("OTLP_ENDPOINT 未設定");
 
 // 設定 OpenTelemetry 日誌
 builder.Logging.AddOpenTelemetry(logging =>
@@ -25,10 +34,10 @@ builder.Logging.AddOpenTelemetry(logging =>
 
 // 設定 OpenTelemetry
 builder.Services.AddOpenTelemetry()
-    .ConfigureResource(r => r.AddService(serviceName))
+    .ConfigureResource(r => r.AddService(moduleName))
     .WithTracing(t =>
     {
-        t.AddSource(serviceName);
+        t.AddSource(moduleName);
         t.AddHttpClientInstrumentation();
         t.AddAspNetCoreInstrumentation();
         t.AddOtlpExporter(o =>
@@ -49,6 +58,19 @@ builder.Services.AddOpenTelemetry()
             o.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
         });
     });
+
+// 註冊 ActivitySource
+builder.Services.AddSingleton(_ =>
+{
+    var config = builder.Configuration.Get<Config>();
+    return new ActivitySource(moduleName);
+});
+
+// 註冊 Repository
+builder.Services.AddScoped<IWeatherForecastRepository, WeatherForecastRepository>();
+
+// 註冊 Service
+builder.Services.AddScoped<IWeatherForecastService, WeatherForecastService>();
 
 builder.Services.AddControllers();
 

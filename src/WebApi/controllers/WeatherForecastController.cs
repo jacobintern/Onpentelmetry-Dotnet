@@ -1,51 +1,24 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using WebApi.interfaces;
+using WebApi.Models;
 
-namespace WebApi.Controllers
+namespace WebApi.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class WeatherForecastController(
+    IWeatherForecastService service,
+    ActivitySource activitySource) : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    private readonly ActivitySource _activitySource = activitySource;
+    private readonly IWeatherForecastService _service = service;
+    [HttpGet]
+    public IEnumerable<WeatherForecastModel> Get()
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild",
-            "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        using var activity = _activitySource.StartActivity("controller-span");
 
-        private static readonly ActivitySource ActivitySource = new("demo.Api");
-
-        private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
-        {
-            _logger = logger;
-        }
-
-        [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
-        {
-            _logger.LogInformation("Processing WeatherForecast request");
-
-            using var activity = ActivitySource.StartActivity("manual-span");
-
-            Console.WriteLine($"Manual span created: {activity?.Id}");
-
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
-        }
-    }
-
-    public class WeatherForecast
-    {
-        public DateTime Date { get; set; }
-        public int TemperatureC { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-        public string? Summary { get; set; }
+        return _service.List();
     }
 }
