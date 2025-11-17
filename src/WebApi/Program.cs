@@ -10,6 +10,19 @@ const string serviceName = "demo.Api";
 var endpoint = Environment.GetEnvironmentVariable("OTLP_ENDPOINT");
 Console.WriteLine($"OTLP endpoint = {endpoint}");
 
+// 設定 OpenTelemetry 日誌
+builder.Logging.AddOpenTelemetry(logging =>
+{
+    logging.IncludeScopes = true;
+    logging.ParseStateValues = true;
+    logging.IncludeFormattedMessage = true;
+    logging.AddOtlpExporter(exporter =>
+    {
+        exporter.Endpoint = new Uri(endpoint);
+        exporter.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
+    });
+});
+
 // 設定 OpenTelemetry
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(r => r.AddService(serviceName))
@@ -24,7 +37,7 @@ builder.Services.AddOpenTelemetry()
             o.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
         });
         // Debug 用
-        t.AddConsoleExporter();
+        // t.AddConsoleExporter();
     })
     .WithMetrics(m =>
     {
@@ -36,8 +49,6 @@ builder.Services.AddOpenTelemetry()
             o.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
         });
     });
-
-builder.Logging.AddOpenTelemetry(logging => logging.AddConsoleExporter());
 
 builder.Services.AddControllers();
 
