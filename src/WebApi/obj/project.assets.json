@@ -1820,7 +1820,13 @@
         "warnAsError": [
           "NU1605"
         ]
-      }
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "10.0.200"
     },
     "frameworks": {
       "net8.0": {
@@ -1874,6 +1880,20 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.25, 8.0.25]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.osx-arm64",
+            "version": "[8.0.25, 8.0.25]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.25, 8.0.25]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -1882,8 +1902,40 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/opt/homebrew/Cellar/dotnet@8/8.0.17/libexec/sdk/8.0.117/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.201/PortableRuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'OpenTelemetry.Exporter.OpenTelemetryProtocol' 1.13.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-4625-4j76-fww9",
+      "libraryId": "OpenTelemetry.Exporter.OpenTelemetryProtocol",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'OpenTelemetry.Exporter.OpenTelemetryProtocol' 1.13.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-mr8r-92fq-pj8p",
+      "libraryId": "OpenTelemetry.Exporter.OpenTelemetryProtocol",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    },
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'OpenTelemetry.Exporter.OpenTelemetryProtocol' 1.13.1 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-q834-8qmm-v933",
+      "libraryId": "OpenTelemetry.Exporter.OpenTelemetryProtocol",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }
